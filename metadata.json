@@ -1,0 +1,5 @@
+{
+  "name": "Farm Management System",
+  "description": "A comprehensive system for managing multi-farm operations, including livestock, crops, inventory, tasks, and finances. This advanced version supports multi-farm architecture and detailed analytics.",
+  "requestFramePermissions": []
+}
