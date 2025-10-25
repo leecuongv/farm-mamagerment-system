@@ -2,6 +2,7 @@ package com.farmmanagement.system.controller;
 
 import com.farmmanagement.system.model.InventoryAudit;
 import com.farmmanagement.system.repository.InventoryAuditRepository;
+import com.farmmanagement.system.security.SecurityUtils;
 import com.farmmanagement.system.service.AuditService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,8 @@ public class InventoryAuditController {
     }
 
     @PostMapping
-    public InventoryAudit createInventoryAudit(@RequestBody InventoryAudit audit, @RequestHeader("user-id") String userId) {
+    public InventoryAudit createInventoryAudit(@RequestBody InventoryAudit audit) {
+        String userId = SecurityUtils.getRequiredUserId();
         // In a real app, you might want to calculate discrepancies here
         InventoryAudit newAudit = inventoryAuditRepository.save(audit);
         auditService.logEvent(userId, "CREATE_INVENTORY_AUDIT", "InventoryAudit", newAudit.getId(),

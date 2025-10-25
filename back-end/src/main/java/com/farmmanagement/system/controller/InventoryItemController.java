@@ -2,6 +2,7 @@ package com.farmmanagement.system.controller;
 
 import com.farmmanagement.system.model.InventoryItem;
 import com.farmmanagement.system.repository.InventoryItemRepository;
+import com.farmmanagement.system.security.SecurityUtils;
 import com.farmmanagement.system.service.AuditService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -63,7 +64,8 @@ public class InventoryItemController {
         )
     })
     @PostMapping
-    public InventoryItem createInventoryItem(@RequestBody InventoryItem item, @RequestHeader("user-id") String userId) {
+    public InventoryItem createInventoryItem(@RequestBody InventoryItem item) {
+        String userId = SecurityUtils.getRequiredUserId();
         InventoryItem newItem = inventoryItemRepository.save(item);
         auditService.logEvent(userId, "CREATE_INVENTORY_ITEM", "InventoryItem", newItem.getId(), "Created inventory item: " + newItem.getName());
         return newItem;
@@ -86,7 +88,8 @@ public class InventoryItemController {
         @ApiResponse(responseCode = "404", description = "Item not found")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<InventoryItem> updateInventoryItem(@PathVariable String id, @RequestBody InventoryItem itemDetails, @RequestHeader("user-id") String userId) {
+    public ResponseEntity<InventoryItem> updateInventoryItem(@PathVariable String id, @RequestBody InventoryItem itemDetails) {
+        String userId = SecurityUtils.getRequiredUserId();
         return inventoryItemRepository.findById(id)
                 .map(item -> {
                     item.setName(itemDetails.getName());
@@ -111,7 +114,8 @@ public class InventoryItemController {
         @ApiResponse(responseCode = "404", description = "Item not found")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteInventoryItem(@PathVariable String id, @RequestHeader("user-id") String userId) {
+    public ResponseEntity<?> deleteInventoryItem(@PathVariable String id) {
+        String userId = SecurityUtils.getRequiredUserId();
         return inventoryItemRepository.findById(id)
                 .map(item -> {
                     inventoryItemRepository.delete(item);

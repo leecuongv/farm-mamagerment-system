@@ -2,6 +2,7 @@ package com.farmmanagement.system.controller;
 
 import com.farmmanagement.system.model.InventoryLog;
 import com.farmmanagement.system.repository.InventoryLogRepository;
+import com.farmmanagement.system.security.SecurityUtils;
 import com.farmmanagement.system.service.AuditService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -62,7 +63,8 @@ public class InventoryLogController {
         )
     })
     @PostMapping
-    public InventoryLog createInventoryLog(@RequestBody InventoryLog log, @RequestHeader("user-id") String userId) {
+    public InventoryLog createInventoryLog(@RequestBody InventoryLog log) {
+        String userId = SecurityUtils.getRequiredUserId();
         // In a real app, you'd also update the quantity in the corresponding InventoryItem
         InventoryLog newLog = inventoryLogRepository.save(log);
         auditService.logEvent(userId, "CREATE_INVENTORY_LOG", "InventoryLog", newLog.getId(),

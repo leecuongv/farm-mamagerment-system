@@ -2,6 +2,8 @@ package com.farmmanagement.system.controller;
 
 import com.farmmanagement.system.model.User;
 import com.farmmanagement.system.repository.UserRepository;
+import com.farmmanagement.system.security.JwtTokenService;
+import com.farmmanagement.system.security.JwtTokenService.TokenDetails;
 import com.farmmanagement.system.service.AuditService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Tag(name = "Authentication", description = "User authentication endpoints")
@@ -30,6 +34,9 @@ public class AuthController {
 
     @Autowired
     private AuditService auditService;
+
+    @Autowired
+    private JwtTokenService jwtTokenService;
 
     // This is a simplified login. In a real app, you'd use Spring Security, password encoding, and JWT generation.
     @Operation(summary = "Login", description = "Authenticate a user with email and password.")
@@ -67,10 +74,27 @@ public class AuthController {
         // Simplified password check. DO NOT use in production.
         if (user.getPassword() != null && user.getPassword().equals(password)) {
             auditService.logEvent(user.getId(), "USER_LOGIN", "User", user.getId(), "User logged in successfully");
-            // In a real app, return a JWT token here
-            // Bỏ mật khẩu ra khỏi phản hồi
-            user.setPassword(null);
-            return ResponseEntity.ok(Map.of("message", "Login successful", "user", user));
+            TokenDetails tokenDetails = jwtTokenService.generateToken(user);
+
+            Map<String, Object> userPayload = new LinkedHashMap<>();
+            userPayload.put("id", user.getId());
+            userPayload.put("username", user.getUsername());
+            userPayload.put("email", user.getEmail());
+            userPayload.put("fullName", user.getFullName());
+            userPayload.put("role", user.getRole());
+            userPayload.put("farmIds", user.getFarmIds() != null ? List.copyOf(user.getFarmIds()) : List.of());
+            userPayload.put("authProvider", user.getAuthProvider());
+            userPayload.put("isActive", user.isActive());
+            userPayload.put("createdAt", user.getCreatedAt());
+
+            Map<String, Object> responseBody = new LinkedHashMap<>();
+            responseBody.put("message", "Login successful");
+            responseBody.put("token", tokenDetails.token());
+            responseBody.put("tokenType", "Bearer");
+            responseBody.put("expiresAt", tokenDetails.expiresAt().toString());
+            responseBody.put("user", userPayload);
+
+            return ResponseEntity.ok(responseBody);
         }
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");

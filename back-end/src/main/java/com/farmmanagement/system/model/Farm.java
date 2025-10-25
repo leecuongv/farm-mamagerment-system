@@ -4,10 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Document(collection = "farms")
 @Data
@@ -16,9 +19,13 @@ import java.time.LocalDateTime;
 @Builder
 public class Farm {
     @Id
+    @Schema(description = "Unique identifier of the Farm", example = "f12345", required = true)
     private String id;
+    @Schema(description = "Name of the Farm", example = "Green Valley Farm", required = true)
     private String name;
+    @Schema(description = "Location of the Farm", example = "California, USA", required = true)
     private String location;
+    @Schema(description = "Creation timestamp of the Farm record", example = "2023-10-01T12:00:00", required = true)
     private LocalDateTime createdAt;
 
 

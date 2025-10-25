@@ -2,6 +2,7 @@ package com.farmmanagement.system.controller;
 
 import com.farmmanagement.system.model.Farm;
 import com.farmmanagement.system.repository.FarmRepository;
+import com.farmmanagement.system.security.SecurityUtils;
 import com.farmmanagement.system.service.AuditService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -63,7 +64,8 @@ public class FarmController {
         )
     })
     @PostMapping
-    public Farm createFarm(@RequestBody Farm farm, @RequestHeader("user-id") String userId) {
+    public Farm createFarm(@RequestBody Farm farm) {
+        String userId = SecurityUtils.getRequiredUserId();
         Farm newFarm = farmRepository.save(farm);
         auditService.logEvent(userId, "CREATE_FARM", "Farm", newFarm.getId(), "Created new farm: " + newFarm.getName());
         return newFarm;
@@ -109,7 +111,8 @@ public class FarmController {
         @ApiResponse(responseCode = "404", description = "Farm not found")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<Farm> updateFarm(@PathVariable String id, @RequestBody Farm farmDetails, @RequestHeader("user-id") String userId) {
+    public ResponseEntity<Farm> updateFarm(@PathVariable String id, @RequestBody Farm farmDetails) {
+        String userId = SecurityUtils.getRequiredUserId();
         return farmRepository.findById(id)
                 .map(farm -> {
                     farm.setName(farmDetails.getName());
@@ -134,7 +137,8 @@ public class FarmController {
         @ApiResponse(responseCode = "404", description = "Farm not found")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteFarm(@PathVariable String id, @RequestHeader("user-id") String userId) {
+    public ResponseEntity<?> deleteFarm(@PathVariable String id) {
+        String userId = SecurityUtils.getRequiredUserId();
         return farmRepository.findById(id)
                 .map(farm -> {
                     farmRepository.delete(farm);

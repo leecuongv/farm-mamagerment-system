@@ -3,6 +3,7 @@ package com.farmmanagement.system.controller;
 import com.farmmanagement.system.model.Role;
 import com.farmmanagement.system.model.User;
 import com.farmmanagement.system.repository.UserRepository;
+import com.farmmanagement.system.security.SecurityUtils;
 import com.farmmanagement.system.service.AuditService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,8 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user, @RequestHeader("user-id") String adminId) {
+    public User createUser(@RequestBody User user) {
+        String adminId = SecurityUtils.getRequiredUserId();
         // In a real app, you'd hash the password here before saving
         User newUser = userRepository.save(user);
         auditService.logEvent(adminId, "CREATE_USER", "User", newUser.getId(), "Created new user: " + newUser.getEmail());
@@ -42,7 +44,8 @@ public class UserController {
     }
 
     @PutMapping("/{id}/assign-farm")
-    public ResponseEntity<User> assignFarmToUser(@PathVariable String id, @RequestBody Map<String, String> payload, @RequestHeader("user-id") String adminId) {
+    public ResponseEntity<User> assignFarmToUser(@PathVariable String id, @RequestBody Map<String, String> payload) {
+        String adminId = SecurityUtils.getRequiredUserId();
         String farmId = payload.get("farmId");
         String role = payload.get("role");
 
@@ -58,7 +61,8 @@ public class UserController {
     }
 
     @PostMapping("/{id}/activate")
-    public ResponseEntity<User> toggleUserActivation(@PathVariable String id, @RequestBody Map<String, Boolean> payload, @RequestHeader("user-id") String adminId) {
+    public ResponseEntity<User> toggleUserActivation(@PathVariable String id, @RequestBody Map<String, Boolean> payload) {
+        String adminId = SecurityUtils.getRequiredUserId();
         boolean isActive = payload.get("isActive");
         return userRepository.findById(id)
                 .map(user -> {

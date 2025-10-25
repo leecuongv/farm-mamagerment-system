@@ -2,10 +2,15 @@ package com.farmmanagement.system.controller;
 
 import com.farmmanagement.system.model.AnimalEvent;
 import com.farmmanagement.system.repository.AnimalEventRepository;
+import com.farmmanagement.system.security.SecurityUtils;
 import com.farmmanagement.system.service.AuditService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -25,7 +30,8 @@ public class AnimalEventController {
     }
 
     @PostMapping
-    public AnimalEvent createAnimalEvent(@RequestBody AnimalEvent event, @RequestHeader("user-id") String userId) {
+    public AnimalEvent createAnimalEvent(@RequestBody AnimalEvent event) {
+        String userId = SecurityUtils.getRequiredUserId();
         AnimalEvent newEvent = animalEventRepository.save(event);
         auditService.logEvent(userId, "CREATE_ANIMAL_EVENT", "AnimalEvent", newEvent.getId(),
                 "Created event " + newEvent.getType() + " for animal " + newEvent.getAnimalId());

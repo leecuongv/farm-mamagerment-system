@@ -2,6 +2,7 @@ package com.farmmanagement.system.controller;
 
 import com.farmmanagement.system.model.Animal;
 import com.farmmanagement.system.repository.AnimalRepository;
+import com.farmmanagement.system.security.SecurityUtils;
 import com.farmmanagement.system.service.AuditService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -63,7 +64,8 @@ public class AnimalController {
         )
     })
     @PostMapping
-    public Animal createAnimal(@RequestBody Animal animal, @RequestHeader("user-id") String userId) {
+    public Animal createAnimal(@RequestBody Animal animal) {
+        String userId = SecurityUtils.getRequiredUserId();
         Animal newAnimal = animalRepository.save(animal);
         auditService.logEvent(userId, "CREATE_ANIMAL", "Animal", newAnimal.getId(), "Created new animal: " + newAnimal.getTagId());
         return newAnimal;
@@ -109,7 +111,8 @@ public class AnimalController {
         @ApiResponse(responseCode = "404", description = "Animal not found")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<Animal> updateAnimal(@PathVariable String id, @RequestBody Animal animalDetails, @RequestHeader("user-id") String userId) {
+    public ResponseEntity<Animal> updateAnimal(@PathVariable String id, @RequestBody Animal animalDetails) {
+        String userId = SecurityUtils.getRequiredUserId();
         return animalRepository.findById(id)
                 .map(animal -> {
                     // Update relevant fields
@@ -135,7 +138,8 @@ public class AnimalController {
         @ApiResponse(responseCode = "404", description = "Animal not found")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteAnimal(@PathVariable String id, @RequestHeader("user-id") String userId) {
+    public ResponseEntity<?> deleteAnimal(@PathVariable String id) {
+        String userId = SecurityUtils.getRequiredUserId();
         return animalRepository.findById(id)
                 .map(animal -> {
                     animalRepository.delete(animal);

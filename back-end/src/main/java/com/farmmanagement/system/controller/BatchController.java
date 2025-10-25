@@ -2,6 +2,7 @@ package com.farmmanagement.system.controller;
 
 import com.farmmanagement.system.model.Batch;
 import com.farmmanagement.system.repository.BatchRepository;
+import com.farmmanagement.system.security.SecurityUtils;
 import com.farmmanagement.system.service.AuditService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,8 @@ public class BatchController {
     }
 
     @PostMapping
-    public Batch createBatch(@RequestBody Batch batch, @RequestHeader("user-id") String userId) {
+    public Batch createBatch(@RequestBody Batch batch) {
+        String userId = SecurityUtils.getRequiredUserId();
         Batch newBatch = batchRepository.save(batch);
         auditService.logEvent(userId, "CREATE_BATCH", "Batch", newBatch.getId(), "Created new batch: " + newBatch.getBatchCode());
         return newBatch;

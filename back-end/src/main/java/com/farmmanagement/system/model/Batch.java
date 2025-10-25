@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -17,13 +19,21 @@ import java.util.List;
 @Builder
 public class Batch {
     @Id
+    @Schema(description = "Unique identifier for the batch", example = "batch123")
     private String id;
+    @Schema(description = "Unique identifier for the farm", example = "farm123")
     private String farmId;
+    @Schema(description = "Unique code for the batch", example = "BATCH-001")
     private String batchCode;
+    @Schema(description = "Type of the batch", example = "ANIMAL")
     private BatchType type;
+    @Schema(description = "Description of the batch", example = "Batch for animal feed")
     private String description;
+    @Schema(description = "Source of the batch", example = "Local Supplier")
     private String source;
+    @Schema(description = "Entry date of the batch", example = "2024-01-15")
     private LocalDate entryDate;
+    @Schema(description = "List of related item IDs", example = "[\"item123\", \"item456\"]")
     private List<String> relatedItemIds;
 
     public enum BatchType {

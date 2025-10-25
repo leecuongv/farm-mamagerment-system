@@ -2,6 +2,7 @@ package com.farmmanagement.system.controller;
 
 import com.farmmanagement.system.model.Enclosure;
 import com.farmmanagement.system.repository.EnclosureRepository;
+import com.farmmanagement.system.security.SecurityUtils;
 import com.farmmanagement.system.service.AuditService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -63,7 +64,8 @@ public class EnclosureController {
         )
     })
     @PostMapping
-    public Enclosure createEnclosure(@RequestBody Enclosure enclosure, @RequestHeader("user-id") String userId) {
+    public Enclosure createEnclosure(@RequestBody Enclosure enclosure) {
+        String userId = SecurityUtils.getRequiredUserId();
         Enclosure newEnclosure = enclosureRepository.save(enclosure);
         auditService.logEvent(userId, "CREATE_ENCLOSURE", "Enclosure", newEnclosure.getId(), "Created new enclosure: " + newEnclosure.getName());
         return newEnclosure;
@@ -86,7 +88,8 @@ public class EnclosureController {
         @ApiResponse(responseCode = "404", description = "Enclosure not found")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<Enclosure> updateEnclosure(@PathVariable String id, @RequestBody Enclosure enclosureDetails, @RequestHeader("user-id") String userId) {
+    public ResponseEntity<Enclosure> updateEnclosure(@PathVariable String id, @RequestBody Enclosure enclosureDetails) {
+        String userId = SecurityUtils.getRequiredUserId();
         return enclosureRepository.findById(id)
                 .map(enclosure -> {
                     enclosure.setName(enclosureDetails.getName());
@@ -109,7 +112,8 @@ public class EnclosureController {
         @ApiResponse(responseCode = "404", description = "Enclosure not found")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteEnclosure(@PathVariable String id, @RequestHeader("user-id") String userId) {
+    public ResponseEntity<?> deleteEnclosure(@PathVariable String id) {
+        String userId = SecurityUtils.getRequiredUserId();
         return enclosureRepository.findById(id)
                 .map(enclosure -> {
                     enclosureRepository.delete(enclosure);

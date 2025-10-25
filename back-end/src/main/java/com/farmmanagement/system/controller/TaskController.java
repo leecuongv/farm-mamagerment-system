@@ -2,6 +2,7 @@ package com.farmmanagement.system.controller;
 
 import com.farmmanagement.system.model.Task;
 import com.farmmanagement.system.repository.TaskRepository;
+import com.farmmanagement.system.security.SecurityUtils;
 import com.farmmanagement.system.service.AuditService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,14 +26,16 @@ public class TaskController {
     }
 
     @PostMapping
-    public Task createTask(@RequestBody Task task, @RequestHeader("user-id") String userId) {
+    public Task createTask(@RequestBody Task task) {
+        String userId = SecurityUtils.getRequiredUserId();
         Task newTask = taskRepository.save(task);
         auditService.logEvent(userId, "CREATE_TASK", "Task", newTask.getId(), "Created task: " + newTask.getTitle());
         return newTask;
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Task> updateTask(@PathVariable String id, @RequestBody Task taskDetails, @RequestHeader("user-id") String userId) {
+    public ResponseEntity<Task> updateTask(@PathVariable String id, @RequestBody Task taskDetails) {
+        String userId = SecurityUtils.getRequiredUserId();
         return taskRepository.findById(id)
                 .map(task -> {
                     task.setTitle(taskDetails.getTitle());
@@ -48,7 +51,8 @@ public class TaskController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTask(@PathVariable String id, @RequestHeader("user-id") String userId) {
+    public ResponseEntity<?> deleteTask(@PathVariable String id) {
+        String userId = SecurityUtils.getRequiredUserId();
         return taskRepository.findById(id)
                 .map(task -> {
                     taskRepository.delete(task);

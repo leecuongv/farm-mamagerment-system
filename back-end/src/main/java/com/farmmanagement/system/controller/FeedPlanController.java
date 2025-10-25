@@ -2,6 +2,7 @@ package com.farmmanagement.system.controller;
 
 import com.farmmanagement.system.model.FeedPlan;
 import com.farmmanagement.system.repository.FeedPlanRepository;
+import com.farmmanagement.system.security.SecurityUtils;
 import com.farmmanagement.system.service.AuditService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,14 +26,16 @@ public class FeedPlanController {
     }
 
     @PostMapping
-    public FeedPlan createFeedPlan(@RequestBody FeedPlan feedPlan, @RequestHeader("user-id") String userId) {
+    public FeedPlan createFeedPlan(@RequestBody FeedPlan feedPlan) {
+        String userId = SecurityUtils.getRequiredUserId();
         FeedPlan newFeedPlan = feedPlanRepository.save(feedPlan);
         auditService.logEvent(userId, "CREATE_FEED_PLAN", "FeedPlan", newFeedPlan.getId(), "Created new feed plan: " + newFeedPlan.getName());
         return newFeedPlan;
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<FeedPlan> updateFeedPlan(@PathVariable String id, @RequestBody FeedPlan feedPlanDetails, @RequestHeader("user-id") String userId) {
+    public ResponseEntity<FeedPlan> updateFeedPlan(@PathVariable String id, @RequestBody FeedPlan feedPlanDetails) {
+        String userId = SecurityUtils.getRequiredUserId();
         return feedPlanRepository.findById(id)
                 .map(feedPlan -> {
                     feedPlan.setName(feedPlanDetails.getName());
@@ -47,7 +50,8 @@ public class FeedPlanController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteFeedPlan(@PathVariable String id, @RequestHeader("user-id") String userId) {
+    public ResponseEntity<?> deleteFeedPlan(@PathVariable String id) {
+        String userId = SecurityUtils.getRequiredUserId();
         return feedPlanRepository.findById(id)
                 .map(feedPlan -> {
                     feedPlanRepository.delete(feedPlan);
