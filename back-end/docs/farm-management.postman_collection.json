@@ -17,9 +17,26 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
+                  "const responseJson = pm.response.json();",
+                  "",
                   "pm.test(\"Status code is 200\", function () {",
                   "    pm.response.to.have.status(200);",
-                  "});"
+                  "});",
+                  "",
+                  "pm.test(\"Response contains bearer token\", function () {",
+                  "    pm.expect(responseJson).to.have.property(\"token\").that.is.a(\"string\").and.is.not.empty;",
+                  "    pm.expect(responseJson).to.have.property(\"tokenType\", \"Bearer\");",
+                  "});",
+                  "",
+                  "if (responseJson.token) {",
+                  "    pm.environment.set(\"authToken\", responseJson.token);",
+                  "}",
+                  "if (responseJson.expiresAt) {",
+                  "    pm.environment.set(\"authTokenExpiresAt\", responseJson.expiresAt);",
+                  "}",
+                  "if (responseJson.user && responseJson.user.id) {",
+                  "    pm.environment.set(\"authenticatedUserId\", responseJson.user.id);",
+                  "}"
                 ]
               }
             }
@@ -90,7 +107,8 @@
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"}
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "url": "{{baseUrl}}/farms"
           },
@@ -116,7 +134,7 @@
             "header": [
               {"key": "Content-Type", "value": "application/json"},
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{adminUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "body": {
               "mode": "raw",
@@ -144,7 +162,8 @@
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"}
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "url": "{{baseUrl}}/farms/{{farmId}}"
           },
@@ -170,7 +189,7 @@
             "header": [
               {"key": "Content-Type", "value": "application/json"},
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{adminUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "body": {
               "mode": "raw",
@@ -199,7 +218,7 @@
             "method": "DELETE",
             "header": [
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{adminUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "url": "{{baseUrl}}/farms/{{farmId}}"
           },
@@ -228,7 +247,8 @@
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"}
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "url": "{{baseUrl}}/users"
           },
@@ -254,7 +274,7 @@
             "header": [
               {"key": "Content-Type", "value": "application/json"},
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{adminUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "body": {
               "mode": "raw",
@@ -282,7 +302,8 @@
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"}
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "url": "{{baseUrl}}/users/{{userId}}"
           },
@@ -308,7 +329,7 @@
             "header": [
               {"key": "Content-Type", "value": "application/json"},
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{adminUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "body": {
               "mode": "raw",
@@ -338,7 +359,7 @@
             "header": [
               {"key": "Content-Type", "value": "application/json"},
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{adminUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "body": {
               "mode": "raw",
@@ -371,7 +392,8 @@
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"}
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "url": "{{baseUrl}}/animals?farmId={{farmId}}"
           },
@@ -397,7 +419,7 @@
             "header": [
               {"key": "Content-Type", "value": "application/json"},
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{managerUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "body": {
               "mode": "raw",
@@ -425,7 +447,8 @@
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"}
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "url": "{{baseUrl}}/animals/{{animalId}}"
           },
@@ -451,7 +474,7 @@
             "header": [
               {"key": "Content-Type", "value": "application/json"},
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{managerUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "body": {
               "mode": "raw",
@@ -480,7 +503,7 @@
             "method": "DELETE",
             "header": [
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{managerUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "url": "{{baseUrl}}/animals/{{animalId}}"
           },
@@ -509,7 +532,8 @@
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"}
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "url": "{{baseUrl}}/animal-events?animalId={{animalId}}"
           },
@@ -535,7 +559,7 @@
             "header": [
               {"key": "Content-Type", "value": "application/json"},
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{managerUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "body": {
               "mode": "raw",
@@ -568,7 +592,8 @@
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"}
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "url": "{{baseUrl}}/batches?farmId={{farmId}}"
           },
@@ -594,7 +619,7 @@
             "header": [
               {"key": "Content-Type", "value": "application/json"},
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{managerUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "body": {
               "mode": "raw",
@@ -622,7 +647,8 @@
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"}
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "url": "{{baseUrl}}/batches/{{batchId}}"
           },
@@ -651,7 +677,8 @@
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"}
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "url": "{{baseUrl}}/enclosures?farmId={{farmId}}"
           },
@@ -677,7 +704,7 @@
             "header": [
               {"key": "Content-Type", "value": "application/json"},
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{managerUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "body": {
               "mode": "raw",
@@ -707,7 +734,7 @@
             "header": [
               {"key": "Content-Type", "value": "application/json"},
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{managerUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "body": {
               "mode": "raw",
@@ -736,7 +763,7 @@
             "method": "DELETE",
             "header": [
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{managerUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "url": "{{baseUrl}}/enclosures/{{enclosureId}}"
           },
@@ -765,7 +792,8 @@
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"}
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "url": "{{baseUrl}}/feed-plans?farmId={{farmId}}"
           },
@@ -791,7 +819,7 @@
             "header": [
               {"key": "Content-Type", "value": "application/json"},
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{managerUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "body": {
               "mode": "raw",
@@ -821,7 +849,7 @@
             "header": [
               {"key": "Content-Type", "value": "application/json"},
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{managerUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "body": {
               "mode": "raw",
@@ -850,7 +878,7 @@
             "method": "DELETE",
             "header": [
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{managerUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "url": "{{baseUrl}}/feed-plans/{{feedPlanId}}"
           },
@@ -879,7 +907,8 @@
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"}
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "url": "{{baseUrl}}/inventory-items?farmId={{farmId}}"
           },
@@ -905,7 +934,7 @@
             "header": [
               {"key": "Content-Type", "value": "application/json"},
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{managerUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "body": {
               "mode": "raw",
@@ -935,7 +964,7 @@
             "header": [
               {"key": "Content-Type", "value": "application/json"},
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{managerUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "body": {
               "mode": "raw",
@@ -964,7 +993,7 @@
             "method": "DELETE",
             "header": [
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{managerUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "url": "{{baseUrl}}/inventory-items/{{inventoryItemId}}"
           },
@@ -993,7 +1022,8 @@
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"}
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "url": "{{baseUrl}}/inventory-logs?farmId={{farmId}}"
           },
@@ -1019,7 +1049,7 @@
             "header": [
               {"key": "Content-Type", "value": "application/json"},
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{managerUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "body": {
               "mode": "raw",
@@ -1052,7 +1082,8 @@
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"}
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "url": "{{baseUrl}}/inventory-audits?farmId={{farmId}}"
           },
@@ -1078,7 +1109,7 @@
             "header": [
               {"key": "Content-Type", "value": "application/json"},
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{managerUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "body": {
               "mode": "raw",
@@ -1111,7 +1142,8 @@
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"}
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "url": "{{baseUrl}}/financial-transactions?farmId={{farmId}}"
           },
@@ -1137,7 +1169,7 @@
             "header": [
               {"key": "Content-Type", "value": "application/json"},
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{managerUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "body": {
               "mode": "raw",
@@ -1170,7 +1202,8 @@
           "request": {
             "method": "GET",
             "header": [
-              {"key": "Accept", "value": "application/json"}
+              {"key": "Accept", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "url": "{{baseUrl}}/tasks?farmId={{farmId}}"
           },
@@ -1196,7 +1229,7 @@
             "header": [
               {"key": "Content-Type", "value": "application/json"},
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{managerUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "body": {
               "mode": "raw",
@@ -1226,7 +1259,7 @@
             "header": [
               {"key": "Content-Type", "value": "application/json"},
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{managerUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "body": {
               "mode": "raw",
@@ -1255,7 +1288,7 @@
             "method": "DELETE",
             "header": [
               {"key": "Accept", "value": "application/json"},
-              {"key": "user-id", "value": "{{managerUserId}}"}
+              {"key": "Authorization", "value": "Bearer {{authToken}}"}
             ],
             "url": "{{baseUrl}}/tasks/{{taskId}}"
           },
@@ -1266,6 +1299,9 @@
   ],
   "variable": [
     {"key": "baseUrl", "value": "http://localhost:8080", "type": "string"},
+    {"key": "authToken", "value": "", "type": "string"},
+    {"key": "authTokenExpiresAt", "value": "", "type": "string"},
+    {"key": "authenticatedUserId", "value": "", "type": "string"},
     {"key": "adminUserId", "value": "replace-with-admin-id", "type": "string"},
     {"key": "managerUserId", "value": "replace-with-manager-id", "type": "string"},
     {"key": "farmId", "value": "replace-with-farm-id", "type": "string"},
